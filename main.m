@@ -3,6 +3,7 @@ clc;
 close all;
 
 c = 299792458; %m/s , speed of light
+NIST_ECEF = [-1288398.567 -4721696.932	4078625.350]; %Nist ecef location
 
 %% Question 1 PRN 14
 
@@ -33,18 +34,23 @@ gps_week14 = floor(daysSinceStart14 / 7);
 dayNum14 = day(dataPRN14.Time, 'dayofweek') - 1; % -1 is so sunday =0
 
 % Convert to TOW
-receiverTime14 = dayNum14 * 86400 + seconds(timeofday(dataPRN26.Time));
+receiverTime14 = dayNum14 * 86400 + seconds(timeofday(dataPRN14.Time));
 
 expectedRangefromRinex14 = findExpectedRange(NIST_ECEF,receiverTime14,gps_week14,gps_ephem,14);
 
-expectedRangefromRinex14(isnan(dataPRN26.C1C)) = NaN;
+expectedRangefromRinex14(isnan(dataPRN14.C1C)) = NaN;
+
+dPR0 = dataPRN14.C1C - expectedRangefromRinex14; %find error between c1c and expected range
+fprintf('First dPR0 value: %.4f m\n', dPR0(1));
+fprintf('Last dPR0 value:  %.4f m\n', dPR0(end));
+
 
 figure('Name','prn26pseudoandexpected');
 
 plot(receiverTime14./3600 - 72, dataPRN14.C1C);
 hold on;
 plot(receiverTime14./3600 - 72, expectedRangefromRinex14,'r--')
-title('PRN 26 C1C pseudorange and Expected Range')
+title('PRN 14 C1C pseudorange and Expected Range')
 xlabel('Time (hr)')
 ylabel('Range (m)')
 legend('C1C Pseudorange', 'Expected Range')
@@ -52,11 +58,31 @@ cleanFileName = strrep(gcf().Name, ' ', '_');
 fileName = sprintf('%s.png', cleanFileName);
 exportgraphics(gcf, fileName, 'Resolution', 300);
 
-figure('Name','prn26pseudoexpecteddiff');
-plot(receiverTime14./3600 - 72,dataPRN26.C1C - expectedRangefromRinex14)
-title('Error between PRN 26 C1C and Expected Range')
+figure('Name','prn14pseudoexpecteddiff');
+plot(receiverTime14./3600 - 72,dPR0)
+title('Error between PRN 14 C1C and Expected Range')
 xlabel('Time (hr)')
 ylabel('Error (m)')
 cleanFileName = strrep(gcf().Name, ' ', '_');  
 fileName = sprintf('%s.png', cleanFileName);
 exportgraphics(gcf, fileName, 'Resolution', 300);
+
+%% Question 2
+
+[health14,satPos14,satVel14,satClkCorr14,junk14,tgd14] = eph2pvt2025(gps_ephem,[gps_week14 receiverTime14],14);
+
+figure("Name","Satellite 14 Clock Correction Vs Time")
+plot(receiverTime14./3600 - 72,satClkCorr14);
+title('Satellite 14 Clock Bias Vs Time')
+xlabel('Time (hr)')
+ylabel('Satellite Clock Bias (m)')
+
+dPR1 = dataPRN14.C1C - (expectedRangefromRinex14 - satClkCorr14);
+fprintf('First dPR1 value: %.4f m\n', dPR1(1));
+fprintf('Last dPR1 value:  %.4f m\n', dPR1(end));
+
+figure("Name","Satellite 14 with simple Clock Correction")
+plot(receiverTime14./3600 - 72,dPR1);
+title('Error between PRN 14 and Expected Range with simple clock correction applied')
+xlabel('Time (hr)')
+ylabel('Error (m)')
