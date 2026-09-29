@@ -1,4 +1,4 @@
-function [health,satPos,satVel,satClkCorr,junk,tgd] = eph2pvt2025(ephemeris,t_input,prn)
+function [health,satPos,satVel,satClkCorr,relCorr,junk,tgd] = eph2pvt2025(ephemeris,t_input,prn)
 
 %==========================================================================
 %==========================================================================
@@ -206,7 +206,7 @@ for tt = 1:sz % loop through all input times
     health(tt,1) = sat_eph(25); % satellite health (0.00 is useable)
 
     % Calculate relativistic correction (p. 93 of IS-GPS-200G)
-    relCorr(tt,1) = 0; % PA Removed
+    relCorr(tt,1) = c.*(dot(satVel(tt,:), satPos(tt,:))./c^2); % NEW LINE ADDED RELATIVISTIC CORRECTION IN METERS
     junk = 0;
 
     tgd(tt,1) = c*sat_eph(24);

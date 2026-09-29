@@ -69,7 +69,7 @@ exportgraphics(gcf, fileName, 'Resolution', 300);
 
 %% Question 2
 
-[health14,satPos14,satVel14,satClkCorr14,junk14,tgd14] = eph2pvt2025(gps_ephem,[gps_week14 receiverTime14],14);
+[health14,satPos14,satVel14,satClkCorr14,relCorr14,junk14,tgd14] = eph2pvt2025(gps_ephem,[gps_week14 receiverTime14],14);
 
 figure("Name","Satellite 14 Clock Correction Vs Time")
 plot(receiverTime14./3600 - 72,satClkCorr14);
@@ -84,5 +84,36 @@ fprintf('Last dPR1 value:  %.4f m\n', dPR1(end));
 figure("Name","Satellite 14 with simple Clock Correction")
 plot(receiverTime14./3600 - 72,dPR1);
 title('Error between PRN 14 and Expected Range with simple clock correction applied')
+xlabel('Time (hr)')
+ylabel('Error (m)')
+
+%% Question 3 Updated eph2pvt2025 function to include relativistic correction
+
+dPR2 = dataPRN14.C1C - (expectedRangefromRinex14 - satClkCorr14 - relCorr14);
+fprintf('First dPR2 value: %.4f m\n', dPR2(1));
+fprintf('Last dPR2 value:  %.4f m\n', dPR2(end));
+
+figure("Name","Satellite 14 with simple, relativistic Clock Correction")
+plot(receiverTime14./3600 - 72,dPR2);
+title('Error between PRN 14 and Expected Range with simple and relativistic clock correction applied')
+xlabel('Time (hr)')
+ylabel('Error (m)')
+
+%% Question 4
+
+%find elevation of satellite
+[AZ14, EL14, RANGE14] = compute_azelrange(NIST_ECEF, satPos14);
+
+zd_NIST = 2;
+
+tropo = tropomodel(zd_NIST,EL14);
+
+dPR3 = dataPRN14.C1C - (expectedRangefromRinex14 - satClkCorr14 - relCorr14 + tropo);
+fprintf('First dPR3 value: %.4f m\n', dPR3(1));
+fprintf('Last dPR3 value:  %.4f m\n', dPR3(end));
+
+figure("Name","Satellite 14 with simple, relativistic, and troposphere Clock Correction")
+plot(receiverTime14./3600 - 72,dPR3);
+title('Error between PRN 14 and Expected Range with simple, relativistic, tropo clock correction applied')
 xlabel('Time (hr)')
 ylabel('Error (m)')
