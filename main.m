@@ -93,6 +93,12 @@ dPR2 = dataPRN14.C1C - (expectedRangefromRinex14 - satClkCorr14 - relCorr14);
 fprintf('First dPR2 value: %.4f m\n', dPR2(1));
 fprintf('Last dPR2 value:  %.4f m\n', dPR2(end));
 
+figure("Name","Relativistic Clock Correction")
+plot(receiverTime14./3600 - 72,relCorr14);
+title('Relativistic Clock Correction PRN 14')
+xlabel('Time (hr)')
+ylabel('Relativistic Clock Correction (m)')
+
 figure("Name","Satellite 14 with simple, relativistic Clock Correction")
 plot(receiverTime14./3600 - 72,dPR2);
 title('Error between PRN 14 and Expected Range with simple and relativistic clock correction applied')
@@ -112,8 +118,51 @@ dPR3 = dataPRN14.C1C - (expectedRangefromRinex14 - satClkCorr14 - relCorr14 + tr
 fprintf('First dPR3 value: %.4f m\n', dPR3(1));
 fprintf('Last dPR3 value:  %.4f m\n', dPR3(end));
 
+figure("Name","troposphere Clock Correction")
+plot(receiverTime14./3600 - 72,tropo);
+title('Tropo clock correction')
+xlabel('Time (hr)')
+ylabel('Tropo correction (m)')
+
+
 figure("Name","Satellite 14 with simple, relativistic, and troposphere Clock Correction")
 plot(receiverTime14./3600 - 72,dPR3);
 title('Error between PRN 14 and Expected Range with simple, relativistic, tropo clock correction applied')
 xlabel('Time (hr)')
 ylabel('Error (m)')
+
+
+%Option problem 3 work
+
+NIST_LLA = ecef2lla(NIST_ECEF);
+NIST_H = 1658.8; %Orthometric height of nist
+
+for i = 1:length(EL14)
+
+[tropoUNB(i,1), ~ ,~ ,~ ,~]= UNB3M(rad2deg(NIST_LLA(1)),NIST_H,231,rad2deg(EL14(i)));
+
+end
+
+dPR3UNB = dataPRN14.C1C - (expectedRangefromRinex14 - satClkCorr14 - relCorr14 + tropoUNB);
+
+
+figure("Name","Troposphere Clock Correction simple vs UNB3")
+plot(receiverTime14./3600 - 72,tropo); hold on;
+plot(receiverTime14./3600 - 72, tropoUNB)
+title('Tropo clock correction')
+xlabel('Time (hr)')
+ylabel('Tropo correction (m)')
+legend('Simple Model Eq 5.43', 'UNB Model')
+
+
+figure("Name","Troposphere UNB3 correction applied")
+plot(receiverTime14./3600 - 72, dPR3UNB)
+title('Tropo clock correction')
+xlabel('Time (hr)')
+ylabel('Tropo correction (m)')
+
+%% Question 5
+
+
+
+
