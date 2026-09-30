@@ -164,5 +164,12 @@ ylabel('Tropo correction (m)')
 %% Question 5
 
 
+[PRIF12, iono] = ionocorr(dataPRN14.C1C, 1575.42e6, dataPRN14.C2L, 1227.60e6);
 
+dPR4 = PRIF12 - (expectedRangefromRinex14 - satClkCorr14 - relCorr14 + tropo);
 
+figure("Name","Ionospheric correction applied")
+plot(receiverTime14./3600 - 72, dPR4)
+title('Iono clock correction')
+xlabel('Time (hr)')
+ylabel('Iono correction (m)')
