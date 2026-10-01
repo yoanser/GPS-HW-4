@@ -139,7 +139,7 @@ NIST_H = 1658.8; %Orthometric height of nist
 
 for i = 1:length(EL14)
 
-[tropoUNB(i,1), ~ ,~ ,~ ,~]= UNB3M(rad2deg(NIST_LLA(1)),NIST_H,231,rad2deg(EL14(i)));
+[tropoUNB(i,1), ~ ,~ ,~ ,~]= UNB3M(deg2rad(NIST_LLA(1)),NIST_H,231,deg2rad(EL14(i))); %Needs inputs of radians!
 
 end
 
@@ -177,13 +177,34 @@ title('Iono clock correction')
 xlabel('Time (hr)')
 ylabel('Iono correction (m)')
 
-
 figure("Name","Ionospheric correction applied")
 plot(receiverTime14./3600 - 72, dPR4)
 title('Iono clock correction applied (dPR4)')
 xlabel('Time (hr)')
 ylabel('Satellite Range Difference (m)')
 
+
+% Optional question 4 work
+
+lambda2 = c./1227.60e6; %wavelength of C2 band
+lambda5 = c./1176.45e6; %wavelenth of C5 band
+
+
+[CPRIF25, iono25] = ionocorr(dataPRN14.L2W.*lambda2, 1227.60e6, dataPRN14.L5Q.*lambda5, 1176.45e6); %Comparing L2W and L5Q carrier phase (converted to meters) for iono free calculation
+
+dCPR4alt = CPRIF25 - (expectedRangefromRinex14 - satClkCorr14 - relCorr14 + tropo);  
+
+figure("Name","Ionospheric correction (m) for L2W and L5Q")
+plot(receiverTime14./3600 - 72, iono25)
+title('Iono clock correction L2W and L5Q')
+xlabel('Time (hr)')
+ylabel('Iono correction (m)')
+
+figure("Name","Ionospheric correction applied for L2W and L5Q")
+plot(receiverTime14./3600 - 72, dCPR4alt)
+title('Iono clock correction applied (dCPR4alt)')
+xlabel('Time (hr)')
+ylabel('Satellite Range Difference (m)')
 
 %% Question 6 
 figure("Name","Comparing Different Correction")
