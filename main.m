@@ -164,12 +164,47 @@ ylabel('Tropo correction (m)')
 %% Question 5
 
 
-[PRIF12, iono] = ionocorr(dataPRN14.C1C, 1575.42e6, dataPRN14.C2L, 1227.60e6);
+[PRIF12, iono14] = ionocorr(dataPRN14.C1C, 1575.42e6, dataPRN14.C2L, 1227.60e6);
 
 dPR4 = PRIF12 - (expectedRangefromRinex14 - satClkCorr14 - relCorr14 + tropo);
+fprintf('First dPR4 value: %.4f m\n', dPR4(1));
+fprintf('Last dPR4 value:  %.4f m\n', dPR4(end));
 
-figure("Name","Ionospheric correction applied")
-plot(receiverTime14./3600 - 72, dPR4)
+
+figure("Name","Ionospheric correction (m)")
+plot(receiverTime14./3600 - 72, iono14)
 title('Iono clock correction')
 xlabel('Time (hr)')
 ylabel('Iono correction (m)')
+
+
+figure("Name","Ionospheric correction applied")
+plot(receiverTime14./3600 - 72, dPR4)
+title('Iono clock correction applied (dPR4)')
+xlabel('Time (hr)')
+ylabel('Satellite Range Difference (m)')
+
+
+%% Question 6 
+figure("Name","Comparing Different Correction")
+plot(receiverTime14./3600 - 72, dPR1)
+hold on
+plot(receiverTime14./3600 - 72, dPR2)
+plot(receiverTime14./3600 - 72, dPR3)
+%plot(receiverTime14./3600 - 72, dPR3UNB)
+plot(receiverTime14./3600 - 72, dPR4)
+title('Iono clock correction applied (dPR4')
+xlabel('Time (hr)')
+ylabel('Satellite Range Difference (m)')
+legend('dpr1','dpr2','dpr3','dpr4')
+
+%% Question 7
+
+ [MP1,CMC1] = mpath(dataPRN14.C1C , dataPRN14.L1C, 1575.42e6, dataPRN14.L2W, 1227.60e6);
+
+
+figure("Name","CMC1")
+plot(receiverTime14./3600 - 72, CMC1)
+title('CMC1')
+xlabel('Time (hr)')
+ylabel('Satellite Range Difference (m)')
