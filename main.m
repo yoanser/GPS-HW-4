@@ -200,11 +200,64 @@ legend('dpr1','dpr2','dpr3','dpr4')
 
 %% Question 7
 
- [MP1,CMC1] = mpath(dataPRN14.C1C , dataPRN14.L1C, 1575.42e6, dataPRN14.L2W, 1227.60e6);
+ [MP1,CMC1] = mpath(dataPRN14.C1C , dataPRN14.L1C, 1575.42e6, dataPRN14.L2W, 1227.60e6); %C1C call
+ [MP2,CMC2] = mpath(dataPRN14.C2W , dataPRN14.L2W, 1227.60e6, dataPRN14.L1C, 1575.42e6); %C1W call, need a different second frequency
+ [MP3,CMC3] = mpath(dataPRN14.C2L , dataPRN14.L2L, 1227.60e6, dataPRN14.L1C, 1575.42e6); %C2L call
+ [MP4,CMC4] = mpath(dataPRN14.C5Q , dataPRN14.L5Q, 1176.45e6, dataPRN14.L2W, 1227.60e6); %C5Q call
 
 
-figure("Name","CMC1")
+
+figure("Name","CMC of C1C")
+
+subplot(2,1,1)
 plot(receiverTime14./3600 - 72, CMC1)
 title('CMC1')
 xlabel('Time (hr)')
 ylabel('Satellite Range Difference (m)')
+
+subplot(2,1,2)
+plot(receiverTime14./3600 - 72, dataPRN14.S1C)
+title('S1C')
+xlabel('Time (hr)')
+ylabel('SNR (dbHz)')
+
+figure("Name","CMC1 of C2W")
+
+subplot(2,1,1)
+plot(receiverTime14./3600 - 72, CMC2)
+title('CMC of C2W')
+xlabel('Time (hr)')
+ylabel('Satellite Range Difference (m)')
+
+subplot(2,1,2)
+plot(receiverTime14./3600 - 72, dataPRN14.S2W)
+title('S2W')
+xlabel('Time (hr)')
+ylabel('SNR (dbHz)')
+
+figure("Name","CMC of C2L")
+subplot(2,1,1)
+plot(receiverTime14./3600 - 72, CMC3)
+title('CMC of C2L')
+xlabel('Time (hr)')
+ylabel('Satellite Range Difference (m)')
+
+subplot(2,1,2)
+plot(receiverTime14./3600 - 72, dataPRN14.S1L)
+title('S2L')
+xlabel('Time (hr)')
+ylabel('SNR (dbHz)')
+
+figure("Name","CMC of C5Q")
+
+subplot(2,1,1)
+plot(receiverTime14./3600 - 72, CMC4)
+title('CMC of C5Q')
+xlabel('Time (hr)')
+ylabel('Satellite Range Difference (m)')
+
+subplot(2,1,2)
+plot(receiverTime14./3600 - 72, dataPRN14.S5Q)
+title('S5Q')
+xlabel('Time (hr)')
+ylabel('SNR (dbHz)')
